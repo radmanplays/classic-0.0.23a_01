@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Random;
 
 import com.mojang.minecraft.Entity;
+import com.mojang.minecraft.Minecraft;
 import com.mojang.minecraft.level.tile.Tile.SoundType;
 import com.mojang.minecraft.player.Player;
 
@@ -29,9 +30,14 @@ public final class SoundManager {
 	public long lastMusic = System.currentTimeMillis() + 60000L;
 	
 	private IAudioHandle musicHandle;
-	public boolean enabled = true;
+	public Minecraft minecraft;
+	
+	public SoundManager(Minecraft minecraft) {
+		this.minecraft = minecraft;
+	}
+	
 	public boolean playMusic() {
-		if(enabled) {
+		if(minecraft.options.music) {
 			String music = SoundPool.getRandomMusic();
 			IAudioResource trk = this.music.get(music);
 			if (trk == null) {
@@ -57,7 +63,7 @@ public final class SoundManager {
 	}
 
 	public void playSound(String var1, Entity var2) {
-		if(enabled) {
+		if(minecraft.options.sound) {
 			SoundType type = SoundType.getSoundType(var1);
 			String sound = null;
 			if (type != null) {
@@ -88,7 +94,7 @@ public final class SoundManager {
 	}
 
 	public void playSound(String var1, float x, float y, float z) {
-		if(enabled) {
+		if(minecraft.options.sound) {
 			SoundType type = SoundType.getSoundType(var1);
 			String sound = null;
 			if (type != null) {
@@ -133,7 +139,7 @@ public final class SoundManager {
 	}
 	
 	public void settingsChanged() {
-		if (musicHandle != null && !musicHandle.shouldFree() && !enabled) {
+		if (musicHandle != null && !musicHandle.shouldFree() && !minecraft.options.music) {
 			musicHandle.end();
 			this.lastMusic = EagRuntime.steadyTimeMillis();
 		}

@@ -33,7 +33,7 @@ public final class InventoryScreen extends Screen {
 			fillGradient(var2 - 3, var3 - 8, var2 + 23, var3 + 24 - 6, -1862270977, -1056964609);
 		}
 
-		this.drawCenteredString("Select block", this.width / 2, 40, 16777215);
+		drawCenteredString(this.font, "Select block", this.width / 2, 40, 16777215);
 		Textures var7 = this.minecraft.textures;
 		Tesselator var8 = Tesselator.instance;
 		var2 = var7.getTextureId("/terrain.png");
@@ -71,7 +71,7 @@ public final class InventoryScreen extends Screen {
 			var2 = this.getTileAtSlot(var1, var2);
 			Inventory var4 = var10000;
 			if(var2 >= 0) {
-				var4.getSlotContainsTile((Tile)User.creativeTiles.get(var2));
+				var4.setTile((Tile)User.creativeTiles.get(var2));
 			}
 
 			this.minecraft.setScreen((Screen)null);

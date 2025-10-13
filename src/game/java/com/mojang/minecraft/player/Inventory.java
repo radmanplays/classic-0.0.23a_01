@@ -18,7 +18,7 @@ public final class Inventory {
 		return this.slots[this.selectedSlot];
 	}
 
-	public int getSlotContainsID(int var1) {
+	public int containsTileAt(int var1) {
 		for(int var2 = 0; var2 < this.slots.length; ++var2) {
 			if(var1 == this.slots[var2]) {
 				return var2;
@@ -46,9 +46,9 @@ public final class Inventory {
 
 	}
 
-	public final void getSlotContainsTile(Tile var1) {
+	public final void setTile(Tile var1) {
 		if(var1 != null) {
-			int var2 = this.getSlotContainsID(var1.id);
+			int var2 = this.containsTileAt(var1.id);
 			if(var2 >= 0) {
 				this.slots[var2] = this.slots[this.selectedSlot];
 			}

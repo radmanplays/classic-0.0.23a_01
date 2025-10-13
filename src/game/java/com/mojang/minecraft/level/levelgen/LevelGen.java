@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public final class LevelGen {
-	private ProgressListener loadingScreen;
+	private ProgressListener a;
 	private int width;
 	private int height;
 	private int depth;
@@ -18,16 +18,16 @@ public final class LevelGen {
 	private int[] coords = new int[1048576];
 
 	public LevelGen(ProgressListener var1) {
-		this.loadingScreen = var1;
+		this.a = var1;
 	}
 
 	public final Level generateLevel(String var1, int var2, int var3, int var4) {
-		this.loadingScreen.beginLevelLoading("Generating level");
+		this.a.beginLevelLoading("Generating level");
 		this.width = var2;
 		this.height = var3;
 		this.depth = 64;
 		this.blocks = new byte[var2 * var3 << 6];
-		this.loadingScreen.levelLoadUpdate("Raising..");
+		this.a.levelLoadUpdate("Raising..");
 		LevelGen var5 = this;
 		Distort var8 = new Distort(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8));
 		Distort var9 = new Distort(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8));
@@ -57,7 +57,7 @@ public final class LevelGen {
 			}
 		}
 
-		this.loadingScreen.levelLoadUpdate("Eroding..");
+		this.a.levelLoadUpdate("Eroding..");
 		int[] var34 = var11;
 		var5 = this;
 		var9 = new Distort(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8));
@@ -81,7 +81,7 @@ public final class LevelGen {
 			}
 		}
 
-		this.loadingScreen.levelLoadUpdate("Soiling..");
+		this.a.levelLoadUpdate("Soiling..");
 		var34 = var11;
 		var5 = this;
 		int var37 = this.width;
@@ -116,7 +116,7 @@ public final class LevelGen {
 			}
 		}
 
-		this.loadingScreen.levelLoadUpdate("Carving..");
+		this.a.levelLoadUpdate("Carving..");
 		boolean var39 = true;
 		boolean var35 = false;
 		var5 = this;
@@ -176,7 +176,7 @@ public final class LevelGen {
 		this.carveTunnels(Tile.oreCoal.id, 90, 1, 4);
 		this.carveTunnels(Tile.oreIron.id, 70, 2, 4);
 		this.carveTunnels(Tile.oreGold.id, 50, 3, 4);
-		this.loadingScreen.levelLoadUpdate("Watering..");
+		this.a.levelLoadUpdate("Watering..");
 		var5 = this;
 		long var38 = System.nanoTime();
 		long var44 = 0L;
@@ -211,11 +211,11 @@ public final class LevelGen {
 		var5.setNextPhase(100);
 		long var49 = System.nanoTime();
 		System.out.println("Flood filled " + var44 + " tiles in " + (double)(var49 - var38) / 1000000.0D + " ms");
-		this.loadingScreen.levelLoadUpdate("Melting..");
+		this.a.levelLoadUpdate("Melting..");
 		this.addLava();
-		this.loadingScreen.levelLoadUpdate("Growing..");
+		this.a.levelLoadUpdate("Growing..");
 		this.addBeaches(var11);
-		this.loadingScreen.levelLoadUpdate("Planting..");
+		this.a.levelLoadUpdate("Planting..");
 		this.plantTrees(var11);
 		Level var31 = new Level();
 		var31.setData(var2, 64, var3, this.blocks);
@@ -390,7 +390,7 @@ public final class LevelGen {
 	}
 
 	private void setNextPhase(int var1) {
-		this.loadingScreen.setLoadingProgress(var1);
+		this.a.setLoadingProgress(var1);
 	}
 
 	private void addLava() {

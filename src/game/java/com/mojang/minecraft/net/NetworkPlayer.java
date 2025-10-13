@@ -26,6 +26,7 @@ public class NetworkPlayer extends Entity {
 	private float run;
 	private transient int skin = -1;
 	public String name;
+	public String displayName;
 	int tickCount = 0;
 	private Textures textures;
 
@@ -33,6 +34,8 @@ public class NetworkPlayer extends Entity {
 		super(var1.level);
 		this.minecraft = var1;
 		this.zombieModel = var1.playerModel;
+		this.displayName = var3;
+		var3 = Font.removeColorCodes(var3);
 		this.name = var3;
 		this.xp = var4;
 		this.yp = var5;
@@ -175,7 +178,7 @@ public class NetworkPlayer extends Entity {
 		GL11.glColor3f(var7, var7, var7);
 		var7 = 1.0F / 16.0F;
 		float var8 = (float)(-Math.abs(Math.cos((double)var6 * 0.6662D)) * 5.0D * (double)var3 - 23.0D);
-		GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 - this.heightOffset, this.zo + (this.z - this.zo) * var2);
+		GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 - 1.62F, this.zo + (this.z - this.zo) * var2);
 		GL11.glScalef(1.0F, -1.0F, 1.0F);
 		GL11.glTranslatef(0.0F, var8 * var7, 0.0F);
 		GL11.glRotatef(var9, 0.0F, 1.0F, 0.0F);
@@ -190,14 +193,14 @@ public class NetworkPlayer extends Entity {
 		GL11.glRotatef(-this.minecraft.player.yRot, 0.0F, 1.0F, 0.0F);
 		var2 = 0.05F;
 		GL11.glScalef(var2, -var2, var2);
-		GL11.glTranslatef((float)(-var10.width(this.name)) / 2.0F, 0.0F, 0.0F);
+		GL11.glTranslatef((float)(-var10.width(this.displayName)) / 2.0F, 0.0F, 0.0F);
 		GL11.glNormal3f(1.0F, -1.0F, 1.0F);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDisable(GL11.GL_LIGHT0);
-		if(this.name.equalsIgnoreCase("Notch") || this.name.equalsIgnoreCase("radmanplays")) {
-			var10.draw(this.name, 0, 0, 16776960);
+		if(this.name.equalsIgnoreCase("Notch")) {
+			var10.draw(this.displayName, 0, 0, 16776960);
 		} else {
-			var10.draw(this.name, 0, 0, 16777215);
+			var10.draw(this.displayName, 0, 0, 16777215);
 		}
 
 		GL11.glEnable(GL11.GL_LIGHT0);

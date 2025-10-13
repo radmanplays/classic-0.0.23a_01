@@ -84,20 +84,18 @@ public final class Minecraft implements Runnable {
 	public RenderHelper renderHelper = new RenderHelper(this);
 	public LevelIO levelIo = new LevelIO(this.loadingScreen);
 	private LevelGen levelGen = new LevelGen(this.loadingScreen);
-	public SoundManager soundManager = new SoundManager();
+	public SoundManager soundManager = new SoundManager(this);
 	private int ticksRan = 0;
 	public String loadMapUser = null;
-	private InGameHud hud;
+	public InGameHud hud;
 	public int loadMapID = 0;
 	public boolean hideGui = false;
 	public ZombieModel playerModel = new ZombieModel();
 	public ConnectionManager connectionManager;
 	public HitResult hitResult = null;
+	public Options options;
 	String server = null;
 	int port = 0;
-	private float fogColorRed = 0.5F;
-	private float fogColorGreen = 0.8F;
-	private float fogColorBlue = 1.0F;
 	volatile boolean running = false;
 	public String fpsString = "";
 	private boolean mouseGrabbed = false;
@@ -183,7 +181,7 @@ public final class Minecraft implements Runnable {
 				this.height = Display.getHeight();
 			}
 
-			Display.setTitle("Minecraft 0.0.22a_05");
+			Display.setTitle("Minecraft 0.0.23a_01");
 
 			Display.create();
 			Keyboard.create();
@@ -234,7 +232,8 @@ public final class Minecraft implements Runnable {
 
 			this.levelRenderer = new LevelRenderer(this.textures);
 			this.particleEngine = new ParticleEngine(this.level, this.textures);
-			this.player = new Player(this.level, new MovementInputFromOptions());
+			this.options = new Options(this);
+			this.player = new Player(this.level, new MovementInputFromOptions(this.options));
 			this.player.resetPos();
 			if(this.level != null) {
 				this.setLevel(this.level);
@@ -320,35 +319,43 @@ public final class Minecraft implements Runnable {
 							var53 = 0;
 							var50 = Mouse.getDX();
 							var53 = Mouse.getDY();
+							var44.minecraft.yMouseAxis = 1;
+							if(var44.minecraft.options.invertMouse) {
+								var44.minecraft.yMouseAxis = -1;
+							}
 							var44.minecraft.player.turn((float)var50, (float)(var53 * var44.minecraft.yMouseAxis));
 						}
 
 						if(!var44.minecraft.hideGui) {
 							int var68;
+							if (Display.wasResized()) {
+								if(Display.getHeight() != 0) {
+									this.width = Display.getWidth();
+									this.height = Display.getHeight();
+									if(this.hud !=null) {
+										this.hud = new InGameHud(this, this.width, this.height);
+									}
+									
+									if(this.screen != null) {
+										Screen sc = this.screen;
+										this.setScreen((Screen)null);
+										this.setScreen(sc);
+									}
+								}
+							}
+							int scaledWidth = var44.minecraft.width * 240 / var44.minecraft.height;
+							int scaledHeight = var44.minecraft.height * 240 / var44.minecraft.height;
+							int mouseX = Mouse.getX() * scaledWidth / var44.minecraft.width;
+							int mouseY = scaledHeight - Mouse.getY() * scaledHeight / var44.minecraft.height - 1;
 							if(var44.minecraft.level != null) {
 								Player var16 = var44.minecraft.player;
 								Level var5 = var44.minecraft.level;
 								LevelRenderer var6 = var44.minecraft.levelRenderer;
 								ParticleEngine var49 = var44.minecraft.particleEngine;
-								if (Display.wasResized()) {
-									if(Display.getHeight() != 0) {
-										this.width = Display.getWidth();
-										this.height = Display.getHeight();
-										if(this.hud !=null) {
-											this.hud = new InGameHud(this, this.width, this.height);
-										}
-										
-										if(this.screen != null) {
-											Screen sc = this.screen;
-											this.setScreen((Screen)null);
-											this.setScreen(sc);
-										}
-									}
-								}
 								GL11.glViewport(0, 0, var44.minecraft.width, var44.minecraft.height);
 								Level var54 = var44.minecraft.level;
 								Player var60 = var44.minecraft.player;
-								float var65 = 1.0F / (float)(4 - var44.minecraft.levelRenderer.drawDistance);
+								float var65 = 1.0F / (float)(4 - var44.minecraft.options.renderDistance);
 								var65 = (float)Math.pow((double)var65, 0.25D);
 								var44.fogColorRed = 0.6F * (1.0F - var65) + var65;
 								var44.fogColorGreen = 0.8F * (1.0F - var65) + var65;
@@ -394,7 +401,7 @@ public final class Minecraft implements Runnable {
 								Vec3 var61 = new Vec3(var59.x + var66, var59.y + var65, var59.z + var72);
 								var44.minecraft.hitResult = var44.minecraft.level.clip(var59, var61);
 								var44.fogColorMultiplier = 1.0F;
-								var44.renderDistance = (float)(512 >> (var44.minecraft.levelRenderer.drawDistance << 1));
+								var44.renderDistance = (float)(512 >> (var44.minecraft.options.renderDistance << 1));
 								GL11.glMatrixMode(GL11.GL_PROJECTION);
 								GL11.glLoadIdentity();
 								GLU.gluPerspective(70.0F, (float)var44.minecraft.width / (float)var44.minecraft.height, 0.05F, var44.renderDistance);
@@ -475,7 +482,7 @@ public final class Minecraft implements Runnable {
 
 								GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 								var44.setupFog();
-								var6.renderSurroundingGround();
+//								var6.renderSurroundingGround();
 								GL11.glEnable(GL11.GL_BLEND);
 //								GL11.glColorMask(false, false, false, false);
 								var46 = var6.render(var16, 1);
@@ -501,7 +508,7 @@ public final class Minecraft implements Runnable {
 									GL11.glDepthFunc(GL11.GL_LEQUAL);
 								}
 
-								var44.minecraft.hud.render();
+								var44.minecraft.hud.render(var44.minecraft.screen != null, mouseX, mouseY);
 							} else {
 								GL11.glViewport(0, 0, var44.minecraft.width, var44.minecraft.height);
 								GL11.glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
@@ -941,11 +948,11 @@ public final class Minecraft implements Runnable {
 							}
 
 							Inventory var24 = this.player.inventory;
-							var28 = var24.getSlotContainsID(var17);
+							var28 = var24.containsTileAt(var17);
 							if(var28 >= 0) {
 								var24.selectedSlot = var28;
 							} else if(var17 > 0 && User.creativeTiles.contains(Tile.tiles[var17])) {
-								var24.getSlotContainsTile(Tile.tiles[var17]);
+								var24.setTile(Tile.tiles[var17]);
 							}
 						}
 					}
@@ -980,16 +987,11 @@ public final class Minecraft implements Runnable {
 							this.pauseGame();
 						}
 
-						if(Keyboard.getEventKey() == Keyboard.KEY_R) {
+						if(Keyboard.getEventKey() == this.options.load.key) {
 							this.player.resetPos();
 						}
 
-						if(Keyboard.getEventKey() == Keyboard.KEY_M) {
-							soundManager.enabled = !soundManager.enabled;
-							soundManager.settingsChanged();
-						}
-
-						if(Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
+						if(Keyboard.getEventKey() == this.options.save.key) {
 							this.level.setSpawnPos((int)this.player.x, (int)this.player.y, (int)this.player.z, this.player.yRot);
 							this.player.resetPos();
 						}
@@ -998,11 +1000,11 @@ public final class Minecraft implements Runnable {
 							this.level.entities.add(new Zombie(this.level, this.player.x, this.player.y, this.player.z));
 						}
 
-						if(Keyboard.getEventKey() == Keyboard.KEY_B) {
+						if(Keyboard.getEventKey() == this.options.build.key) {
 							this.setScreen(new InventoryScreen());
 						}
 
-						if(Keyboard.getEventKey() == Keyboard.KEY_T && this.connectionManager != null && this.connectionManager.isConnected()) {
+						if(Keyboard.getEventKey() == this.options.chat.key && this.connectionManager != null && this.connectionManager.isConnected()) {
 							this.player.releaseAllKeys();
 							this.setScreen(new ChatScreen());
 						}
@@ -1013,16 +1015,9 @@ public final class Minecraft implements Runnable {
 							this.player.inventory.selectedSlot = var18;
 						}
 					}
+				} while(Keyboard.getEventKey() != this.options.toggleFog.key);
 
-					if(Keyboard.getEventKey() == Keyboard.KEY_Y) {
-						this.yMouseAxis = -this.yMouseAxis;
-					}
-				} while(Keyboard.getEventKey() != Keyboard.KEY_F);
-
-				LevelRenderer var47 = this.levelRenderer;
-				boolean var31 = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
-				var25 = var47;
-				var25.drawDistance = var25.drawDistance + (var31 ? -1 : 1) & 3;
+				this.options.setOption(4, !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && !Keyboard.isKeyDown(Keyboard.KEY_RSHIFT) ? 1 : -1);
 			}
 		}
 
@@ -1094,5 +1089,13 @@ public final class Minecraft implements Runnable {
 		}
 
 		System.gc();
+	}
+	
+	static enum OS {
+		linux,
+		solaris,
+		windows,
+		macos,
+		unknown;
 	}
 }

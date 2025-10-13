@@ -47,6 +47,21 @@ public final class ChatScreen extends Screen {
 
 	public final void render(int var1, int var2) {
 		fill(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
-		this.drawString("> " + this.typedMsg + (this.counter / 6 % 2 == 0 ? "_" : ""), 4, this.height - 12, 14737632);
+		drawString(this.font, "> " + this.typedMsg + (this.counter / 6 % 2 == 0 ? "_" : ""), 4, this.height - 12, 14737632);
+	}
+
+	protected final void mousePressed(int var1, int var2, int var3) {
+		if(var3 == 0 && this.minecraft.hud.hoveredUsername != null) {
+			if(this.typedMsg.length() > 0 && !this.typedMsg.endsWith(" ")) {
+				this.typedMsg = this.typedMsg + " ";
+			}
+
+			this.typedMsg = this.typedMsg + this.minecraft.hud.hoveredUsername;
+			var1 = 64 - (this.minecraft.user.name.length() + 2);
+			if(this.typedMsg.length() > var1) {
+				this.typedMsg = this.typedMsg.substring(0, var1);
+			}
+		}
+
 	}
 }

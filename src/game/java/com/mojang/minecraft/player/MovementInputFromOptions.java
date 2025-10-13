@@ -1,27 +1,34 @@
 package com.mojang.minecraft.player;
 
+import com.mojang.minecraft.Options;
+
 public final class MovementInputFromOptions extends MovementInput {
 	private boolean[] keys = new boolean[10];
+	private Options f;
+
+	public MovementInputFromOptions(Options var1) {
+		this.f = var1;
+	}
 
 	public final void setKey(int var1, boolean var2) {
 		byte var3 = -1;
-		if(var1 == 200 || var1 == 17) {
+		if(var1 == this.f.forward.key) {
 			var3 = 0;
 		}
 
-		if(var1 == 208 || var1 == 31) {
+		if(var1 == this.f.back.key) {
 			var3 = 1;
 		}
 
-		if(var1 == 203 || var1 == 30) {
+		if(var1 == this.f.left.key) {
 			var3 = 2;
 		}
 
-		if(var1 == 205 || var1 == 32) {
+		if(var1 == this.f.right.key) {
 			var3 = 3;
 		}
 
-		if(var1 == 57 || var1 == 219) {
+		if(var1 == this.f.jump.key) {
 			var3 = 4;
 		}
 
